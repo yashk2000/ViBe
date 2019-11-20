@@ -6,12 +6,12 @@ def main():
 
     cap = cv2.VideoCapture('test.avi')
     
-    success, image = cap.read()
+    success, firstFrame = cap.read()
     
     if success:
-        cv2.imwrite("ff.jpg", image)
+        cv2.imwrite("ff.jpg", firstFrame)
     
-    image = cv2.imread('ff.jpg', 0)
+    firstFrame = cv2.imread('ff.jpg', 0)
     success = 1
 
     N = 20
@@ -19,13 +19,15 @@ def main():
     hashMin = 2
     phi = 16
 
-    samples = initializeBackgroud(image, N)
+    samples = initializeBackgroud(firstFrame, N)
     
     height, width = firstFrame.shape
 
-    for i in range (0, 20):
+    for i in range (N):
         s = "outputInitialBackground/" + str(i) + ".jpg"
         cv2.imwrite(s, samples[1 : width - 1, 1 : height - 1, i])
+        
+    count = 0;
         
     while success: 
         success, frame = cap.read()
