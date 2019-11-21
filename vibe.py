@@ -34,7 +34,7 @@ def main():
         
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         
-        segMap, samples = vibe_detection(gray, samples, hashMin, N, R, phi)
+        segMap, samples = VIBE(gray, samples, hashMin, N, R, phi)
         cv2.imshow('segMap', segMap)
         
         t = "op" + str(count) + ".jpg"
@@ -48,11 +48,12 @@ def main():
     
     cv2.destroyAllWindows()
 
-def vibe_detection(frame, samples, hashMin, N, R, phi):
+def VIBE(frame, samples, hashMin, N, R, phi):
     
     height, width = frame.shape
     
     segMap = np.zeros((height, width)).astype(np.uint8)
+    foregroundMatchCount = np.zeros((height, width)).astype(np.uint8)
     
     for i in range (height):
         for j in range (width):
@@ -66,10 +67,12 @@ def vibe_detection(frame, samples, hashMin, N, R, phi):
                 index += 1
                 
             if count >= hashMin:
+                foregroundMatchCount[i, j] = 0
+                segMap[i, j] = 0
                 r = np.random.randint(0, phi - 1)
                 
                 if r == 0:
-                    r = np.random.randint(0, phi - 1)
+                    r = np.random.randint(0, N - 1)
                     samples[i, j, r] = frame[i, j]
                 r = np.random.randint(0, phi - 1)
                 
@@ -78,14 +81,21 @@ def vibe_detection(frame, samples, hashMin, N, R, phi):
                     while(x == 0 and y == 0):
                         x = np.random.randint(-1, 1)
                         y = np.random.randint(-1, 1)
-                    r = np.random.randint(0, phi - 1)
+                    r = np.random.randint(0, N - 1)
                     
                     random_i = i + x
                     random_j = j + y
                     
                     samples[random_i, random_j, r] = frame[i, j]
             else:
+                foregroundMatchCount[i, j] = foregroundMatchCount[i, j] + 1
                 segMap[i, j] = 255
+                if(foregroundMatchCount[i, j] > 50):
+                    r = np.random.randint(0, phi - 1)
+
+                    if r == 0:
+                        r = np.random.randint(0, N - 1)
+                        samples[i, j, r] = frame[i, j]
                 
     return segMap, samples
 
