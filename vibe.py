@@ -4,7 +4,7 @@ import cv2
 
 def main():
 
-    cap = cv2.VideoCapture('test.avi')
+    cap = cv2.VideoCapture('q.avi')
     
     success, firstFrame = cap.read()
     
@@ -16,8 +16,8 @@ def main():
 
     N = 20
     R = 20
-    hashMin = 2
-    phi = 16
+    hashMin = 1
+    phi = 5
 
     samples = initializeBackgroud(firstFrame, N)
     
@@ -92,7 +92,7 @@ def VIBE(frame, samples, hashMin, N, R, phi):
                 segMap[i, j] = 255
                 if(foregroundMatchCount[i, j] > 50):
                     r = np.random.randint(0, phi - 1)
-
+                
                     if r == 0:
                         r = np.random.randint(0, N - 1)
                         samples[i, j, r] = frame[i, j]
